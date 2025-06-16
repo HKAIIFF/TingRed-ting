@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聽.Red - AI音律调运助手</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Orbitron:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #cc2936;
+            --secondary-red: #8b1538;
+            --accent-gold: #d4af37;
+            --dark-gold: #b8860b;
+            --deep-black: #0d0d0d;
+            --soft-black: #1a1a1a;
+            --warm-gray: #2c2c2c;
+            --text-light: #ecf0f1;
+            --text-gold: #f4e4bc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: radial-gradient(circle at 20% 80%, rgba(204, 41, 54, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
+                        linear-gradient(135deg, var(--deep-black) 0%, var(--soft-black) 50%, #2c1810 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(204, 41, 54, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-symbol {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--primary-red), var(--accent-gold));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(204, 41, 54, 0.3);
+        }
+        
+        .logo-symbol::before {
+            content: '聽';
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--primary-red), var(--accent-gold), var(--primary-red));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 5s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .page-title {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .page-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, var(--primary-red), var(--accent-gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .page-title p {
+            font-size: 1.2rem;
+            color: var(--text-gold);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .ai-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .ai-profile {
+            flex: 0 0 250px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(204, 41, 54, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .ai-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, var(--primary-red), var(--accent-gold));
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ai-avatar::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .ai-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .ai-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .ai-info p {
+            color: var(--accent-gold);
+            font-size: 1rem;
+        }
+        
+        .ai-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .ai-stat {
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 15px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .ai-stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 5px;
+        }
+        
+        .ai-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-gold);
+        }
+        
+        .chat-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(204, 41, 54, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(204, 41, 54, 0.3);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h2 {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+        }
+        
+        .chat-status {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--accent-gold);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 15px;
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .ai-message {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 4px solid var(--accent-gold);
+            align-self: flex-start;
+        }
+        
+        .user-message {
+            background: rgba(204, 41, 54, 0.15);
+            border-left: 4px solid var(--primary-red);
+            align-self: flex-end;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .sender {
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+        
+        .user-message .sender {
+            color: var(--primary-red);
+        }
+        
+        .timestamp {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .message-content {
+            line-height: 1.6;
+        }
+        
+        .message-content p {
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .option-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(204, 41, 54, 0.3);
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .option-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--accent-gold);
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(204, 41, 54, 0.3);
+            border-radius: 20px;
+            padding: 12px 20px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+        
+        .send-btn {
+            background: linear-gradient(45deg, var(--primary-red), var(--secondary-red));
+            border: none;
+            border-radius: 20px;
+            padding: 0 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            background: linear-gradient(45deg, var(--accent-gold), #ffed4e);
+            color: #000;
+            transform: translateY(-2px);
+        }
+        
+        .recommendations-section {
+            margin-top: 50px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, var(--primary-red), var(--accent-gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .recommendations-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .recommend-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(204, 41, 54, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .recommend-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 15px 40px rgba(204, 41, 54, 0.25);
+        }
+        
+        .match-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--accent-gold);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .recommend-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--accent-gold);
+        }
+        
+        .recommend-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent-gold);
+            text-align: center;
+        }
+        
+        .recommend-details {
+            font-size: 0.9rem;
+            color: var(--text-gold);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .recommend-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .recommend-btn {
+            background: linear-gradient(45deg, var(--primary-red), var(--secondary-red));
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+        
+        .recommend-btn:hover {
+            background: linear-gradient(45deg, var(--accent-gold), #ffed4e);
+            color: #000;
+        }
+        
+        .cart-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(204, 41, 54, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(204, 41, 54, 0.3);
+        }
+        
+        .cart-header h2 {
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+        }
+        
+        .cart-items {
+            margin-bottom: 30px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(204, 41, 54, 0.1);
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .item-details {
+            font-size: 0.9rem;
+            color: var(--text-gold);
+        }
+        
+        .item-price {
+            font-weight: 700;
+            color: var(--accent-gold);
+            min-width: 100px;
+            text-align: right;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 20px 0;
+            border-top: 1px solid rgba(204, 41, 54, 0.3);
+        }
+        
+        .total-label {
+            color: var(--text-gold);
+        }
+        
+        .total-amount {
+            color: var(--accent-gold);
+        }
+        
+        .checkout-btn {
+            background: linear-gradient(45deg, var(--accent-gold), #ffed4e);
+            color: #000;
+            border: none;
+            padding: 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+        
+        .checkout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+        }
+        
+        .floating-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .sound-wave {
+            position: absolute;
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            animation: soundWave 3s linear infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes soundWave {
+            0% { 
+                transform: translateX(-200px) scaleX(0);
+                opacity: 0;
+            }
+            10% { 
+                opacity: 0.6;
+                transform: translateX(-200px) scaleX(1);
+            }
+            90% { 
+                opacity: 0.6;
+                transform: translateX(calc(100vw + 200px)) scaleX(1);
+            }
+            100% { 
+                transform: translateX(calc(100vw + 200px)) scaleX(0);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .ai-container {
+                flex-direction: column;
+            }
+            
+            .ai-profile {
+                position: relative;
+                width: 100%;
+            }
+            
+            .recommendations-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .page-title h1 {
+                font-size: 2rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <!-- Sound waves -->
+        <div class="sound-wave" style="top: 15%; animation-delay: 0s;"></div>
+        <div class="sound-wave" style="top: 35%; animation-delay: 1s;"></div>
+        <div class="sound-wave" style="top: 55%; animation-delay: 2s;"></div>
+        <div class="sound-wave" style="top: 75%; animation-delay: 3s;"></div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-symbol"></div>
+                <div class="logo-text">Red</div>
+            </div>
+            <div>
+                <h2>AI音律调运助手</h2>
+            </div>
+        </div>
+        
+        <div class="page-title">
+            <h1>与Ting对话，定制您的专属音律调运方案</h1>
+            <p>我们的AI助手Ting将通过轻松的聊天方式，了解您的需求，为您精准匹配专属音频频率</p>
+        </div>
+        
+        <div class="ai-container">
+            <div class="ai-profile">
+                <div class="ai-avatar">T</div>
+                <div class="ai-info">
+                    <h2>Ting</h2>
+                    <p>您的专属音律调运师</p>
+                </div>
+                
+                <div class="ai-stats">
+                    <div class="ai-stat">
+                        <div class="ai-stat-number">92%</div>
+                        <div class="ai-stat-label">用户满意度</div>
+                    </div>
+                    <div class="ai-stat">
+                        <div class="ai-stat-number">10⁷¹</div>
+                        <div class="ai-stat-label">匹配可能性</div>
+                    </div>
+                    <div class="ai-stat">
+                        <div class="ai-stat-number">64</div>
+                        <div class="ai-stat-label">应用场景</div>
+                    </div>
+                    <div class="ai-stat">
+                        <div class="ai-stat-number">31</div>
+                        <div class="ai-stat-label">数据维度</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>与Ting对话</h2>
+                    <div class="chat-status">在线 · 正在输入...</div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will be added here dynamically -->
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="userInput" placeholder="输入您的问题或需求...">
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recommendations-section">
+            <h2 class="section-title">为您推荐的专属音律调运方案</h2>
+            
+            <div class="recommendations-container">
+                <div class="recommend-card">
+                    <div class="match-badge">匹配度: 92%</div>
+                    <div class="recommend-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3 class="recommend-title">事业加速音律包</h3>
+                    <div class="recommend-details">
+                        <p>提升职场竞争力，增强领导力和决策能力，助您突破事业瓶颈。</p>
+                        <p>✓ 专属频率: 528Hz + 936Hz</p>
+                        <p>✓ 能量加持: 事业星阵</p>
+                    </div>
+                    <div class="recommend-price">¥2,998</div>
+                    <button class="recommend-btn">加入购物车</button>
+                </div>
+                
+                <div class="recommend-card">
+                    <div class="match-badge">匹配度: 89%</div>
+                    <div class="recommend-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="recommend-title">五路财神音律包</h3>
+                    <div class="recommend-details">
+                        <p>增强财运能量，提升投资直觉，吸引财富机会。</p>
+                        <p>✓ 专属频率: 417Hz + 639Hz</p>
+                        <p>✓ 能量加持: 财神符咒</p>
+                    </div>
+                    <div class="recommend-price">¥3,498</div>
+                    <button class="recommend-btn">加入购物车</button>
+                </div>
+                
+                <div class="recommend-card">
+                    <div class="match-badge">匹配度: 87%</div>
+                    <div class="recommend-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="recommend-title">姻缘美满音律包</h3>
+                    <div class="recommend-details">
+                        <p>增强个人魅力，改善人际关系，吸引正缘伴侣。</p>
+                        <p>✓ 专属频率: 639Hz + 741Hz</p>
+                        <p>✓ 能量加持: 月老红线</p>
+                    </div>
+                    <div class="recommend-price">¥2,598</div>
+                    <button class="recommend-btn">加入购物车</button>
+                </div>
+            </div>
+            
+            <div class="cart-section">
+                <div class="cart-header">
+                    <h2>您的购物车</h2>
+                    <div class="cart-count">3 项产品</div>
+                </div>
+                
+                <div class="cart-items">
+                    <div class="cart-item">
+                        <div class="item-info">
+                            <div class="item-name">事业加速音律包</div>
+                            <div class="item-details">专属频率: 528Hz + 936Hz</div>
+                        </div>
+                        <div class="item-price">¥2,998</div>
+                    </div>
+                    
+                    <div class="cart-item">
+                        <div class="item-info">
+                            <div class="item-name">五路财神音律包</div>
+                            <div class="item-details">专属频率: 417Hz + 639Hz</div>
+                        </div>
+                        <div class="item-price">¥3,498</div>
+                    </div>
+                    
+                    <div class="cart-item">
+                        <div class="item-info">
+                            <div class="item-name">姻缘美满音律包</div>
+                            <div class="item-details">专属频率: 639Hz + 741Hz</div>
+                        </div>
+                        <div class="item-price">¥2,598</div>
+                    </div>
+                </div>
+                
+                <div class="cart-total">
+                    <div class="total-label">总计:</div>
+                    <div class="total-amount">¥9,094</div>
+                </div>
+                
+                <button class="checkout-btn">前往结算</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟AI对话系统
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chatMessages');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            // 初始消息
+            setTimeout(() => {
+                addAIMessage("您好！我是您的专属音律调运师Ting。很高兴见到您！今天有什么可以帮您改善运势的吗？");
+            }, 1000);
+            
+            // 添加AI消息
+            function addAIMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ai-message';
+                
+                const now = new Date();
+                const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <div class="sender">Ting</div>
+                        <div class="timestamp">${timeStr}</div>
+                    </div>
+                    <div class="message-content">
+                        <p>${text}</p>
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // 添加用户消息
+            function addUserMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user-message';
+                
+                const now = new Date();
+                const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <div class="sender">您</div>
+                        <div class="timestamp">${timeStr}</div>
+                    </div>
+                    <div class="message-content">
+                        <p>${text}</p>
+                    </div>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // 发送消息
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message) {
+                    addUserMessage(message);
+                    userInput.value = '';
+                    
+                    // 模拟AI回复
+                    setTimeout(() => {
+                        if (message.toLowerCase().includes('事业') || message.includes('工作')) {
+                            addAIMessage("明白了，您想提升事业运势。能告诉我您目前的职业状况吗？比如您是创业者、企业高管还是职场新人？");
+                        } else if (message.toLowerCase().includes('财富') || message.includes('财运') || message.includes('赚钱')) {
+                            addAIMessage("好的，财富运势优化。您是想增强正财收入（如工资）还是偏财收入（如投资）？或者两者都关注？");
+                        } else if (message.toLowerCase().includes('感情') || message.includes('姻缘') || message.includes('爱情')) {
+                            addAIMessage("感情运势提升，这是个重要的领域。您目前是单身想脱单，还是有伴侣想改善关系？");
+                        } else if (message.toLowerCase().includes('健康')) {
+                            addAIMessage("健康是基础，非常重要。您想关注哪方面的健康？睡眠质量、精力恢复、情绪调节，还是特定身体部位的调理？");
+                        } else if (message.toLowerCase().includes('出生')) {
+                            addAIMessage("感谢提供出生信息！我正在为您分析命盘...根据您的生辰八字，您命格中金旺土弱，事业宫有紫微星入驻，财帛宫呈现天机化禄格局。我为您定制了专属音律方案，请查看下方的推荐产品！");
+                        } else {
+                            const responses = [
+                                "非常有趣的想法！能详细说说您的需求吗？",
+                                "明白了，我会为您找到最适合的音律方案。您能提供出生日期和时间吗？这样我能为您做更精准的匹配。",
+                                "感谢您的分享！为了给您最精准的推荐，我需要了解一些基本信息：您的出生日期和时间（精确到分钟）、出生地点，以及您最想改善的3个方面。",
+                                "好的，我已记录下您的需求。根据系统分析，我推荐您考虑事业加速音律包和五路财神音律包的组合，这对您的命格特别有效！"
+                            ];
+                            addAIMessage(responses[Math.floor(Math.random() * responses.length)]);
+                        }
+                    }, 1000);
+                }
+            }
+            
+            // 事件监听
+            sendBtn.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // 添加加入购物车功能
+            document.querySelectorAll('.recommend-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.recommend-card');
+                    const title = card.querySelector('.recommend-title').textContent;
+                    const price = card.querySelector('.recommend-price').textContent;
+                    
+                    this.textContent = '✓ 已加入';
+                    this.style.background = 'linear-gradient(45deg, #10b981, #059669)';
+                    
+                    setTimeout(() => {
+                        this.textContent = '加入购物车';
+                        this.style.background = 'linear-gradient(45deg, var(--primary-red), var(--secondary-red))';
+                    }, 2000);
+                    
+                    addAIMessage(`已将"${title}"加入您的购物车！`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
